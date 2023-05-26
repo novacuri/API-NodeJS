@@ -1,0 +1,12 @@
+{
+  "name": "stock-api",
+  "version": "1.0.0",
+  "description": "API para cotizaciones de acciones",
+  "dependencies": {
+    "express": "^4.17.1",
+    "yahoo-finance2": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}

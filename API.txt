@@ -1,0 +1,65 @@
+¡Claro! Aquí tienes un ejemplo de cómo se puede crear una API en Node.js para proporcionar cotizaciones en tiempo real de acciones utilizando la biblioteca `yahoo-finance2`.
+
+Primero, asegúrate de que tengas Node.js y npm instalados en tu máquina. Luego, abre una terminal y crea un nuevo directorio para tu proyecto. En ese directorio, crea un archivo `package.json` con el siguiente contenido:
+
+
+{
+  "name": "stock-api",
+  "version": "1.0.0",
+  "description": "API para cotizaciones de acciones",
+  "dependencies": {
+    "express": "^4.17.1",
+    "yahoo-finance2": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+
+
+Este archivo define las dependencias necesarias para el proyecto: `express` para crear la API, y `yahoo-finance2` para obtener los datos de cotización. También define un script para iniciar la aplicación.
+
+Luego, instala las dependencias ejecutando `npm install` en la terminal.
+
+A continuación, crea un archivo `index.js` con el siguiente contenido:
+
+javascript
+const express = require('express');
+const yahooFinance = require('yahoo-finance2');
+const app = express();
+
+app.get('/stock/:symbol', async (req, res) => {
+  const symbol = req.params.symbol.toUpperCase();
+  try {
+    const data = await yahooFinance.quoteSummary(symbol);
+    const price = data.price.regularMarketPrice;
+    const spread = data.price.regularMarketAsk.raw - data.price.regularMarketBid.raw;
+    const prevClose = data.price.regularMarketPreviousClose.raw;
+    const changePct = ((price - prevClose) / prevClose) * 100;
+    res.json({
+      symbol,
+      price: parseFloat(price.toFixed(2)),
+      spread: parseFloat(spread.toFixed(2)),
+      changePct: parseFloat(changePct.toFixed(2)),
+    });
+  } catch (error) {
+    res.status(404).json({ message: 'Symbol not found' });
+  }
+});
+
+app.listen(3000, () => console.log('Server started on port 3000'));
+
+
+Este código define una ruta `/stock/:symbol` que espera un parámetro `symbol` y devuelve un objeto JSON que contiene el símbolo, el precio actual, el spread y la variación porcentual desde el cierre anterior. Utiliza la función `quoteSummary` de `yahoo-finance2` para obtener los datos de cotización de la acción.
+
+Para ejecutar la aplicación, ejecuta `npm start` en la terminal. La aplicación estará disponible en `http://localhost:3000`.
+
+Para actualizar los datos cada minuto, puedes utilizar la función `setInterval` de JavaScript. Aquí te proporciono un ejemplo:
+
+javascript
+setInterval(() => {
+  // Actualizar los datos de las acciones aquí
+}, 60000);
+
+
+Este código ejecuta la función dentro del `setInterval` cada 60 segundos. Aquí puedes llamar a la función que llama a la API `/stock/:symbol` para actualizar los datos de las acciones.
